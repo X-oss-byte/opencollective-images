@@ -13,9 +13,10 @@ const debugAvatar = debug('avatar');
 
 const imagesUrl = process.env.IMAGES_URL;
 
-const getSvg = svgPath => fs.readFileSync(path.join(__dirname, svgPath), { encoding: 'utf8' });
+const getSvg = (svgPath) => fs.readFileSync(path.join(__dirname, svgPath), { encoding: 'utf8' });
 
 const anonymousSvg = getSvg('../../static/images/default-anonymous-logo.svg');
+const guestSvg = getSvg('../../static/images/default-guest-logo.svg');
 
 const sendSvg = (res, svg) => {
   res.setHeader('Cache-Control', 'public, max-age=7200');
@@ -61,6 +62,10 @@ const proxyImage = async (req, res, imageUrl, { imageFormat }) => {
 };
 
 export default async function avatar(req, res) {
+  if (req.params.backerType && req.params.backerType === 'contributors') {
+    return res.status(404).send('Not found');
+  }
+
   if (
     req.params.backerType &&
     (req.params.backerType.match(/organization/i) || req.params.backerType.match(/individual/i))
@@ -110,9 +115,15 @@ export default async function avatar(req, res) {
     maxHeight = Number(req.query.avatarHeight);
   } else {
     maxHeight = format === 'svg' ? 128 : 64;
-    if (selector.match(/silver/)) maxHeight *= 1.25;
-    if (selector.match(/gold/)) maxHeight *= 1.5;
-    if (selector.match(/diamond/)) maxHeight *= 2;
+    if (selector.match(/silver/)) {
+      maxHeight *= 1.25;
+    }
+    if (selector.match(/gold/)) {
+      maxHeight *= 1.5;
+    }
+    if (selector.match(/diamond/)) {
+      maxHeight *= 2;
+    }
     maxWidth = maxHeight * 3;
   }
 
@@ -126,6 +137,12 @@ export default async function avatar(req, res) {
       return sendSvg(
         res,
         anonymousSvg.replace('width="88"', `width="${imageHeight}"`).replace('height="88"', `height="${imageHeight}"`),
+      );
+    } else if (user.isGuest && user.name === 'Guest') {
+      const imageHeight = Math.round(maxHeight / 2);
+      return sendSvg(
+        res,
+        guestSvg.replace('width="96"', `width="${imageHeight}"`).replace('height="96"', `height="${imageHeight}"`),
       );
     }
 

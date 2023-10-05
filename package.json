@@ -5,30 +5,38 @@
     "type": "git",
     "url": "https://github.com/opencollective/opencollective-images.git"
   },
+  "jest": {
+    "testPathIgnorePatterns": ["opencollective-api/"]
+  },
   "private": true,
   "engines": {
     "node": "^12.6.0",
     "npm": "^6.9.0"
   },
   "dependencies": {
-    "bluebird": "^3.7.1",
-    "cached-request": "^2.0.1",
-    "debug": "^4.1.1",
-    "dotenv": "^8.2.0",
-    "express": "^4.17.1",
-    "express-winston": "^4.0.1",
-    "graphql-request": "^1.8.2",
-    "image-size": "^0.8.3",
-    "image-to-ascii": "^3.0.12",
-    "lodash": "^4.17.15",
-    "lru-cache": "^5.1.1",
-    "mime-types": "^2.1.24",
-    "node-fetch": "^2.6.0",
-    "p-limit": "^2.2.1",
-    "redis": "^2.8.0",
-    "request": "^2.88.0",
-    "sharp": "^0.23.2",
-    "winston": "^3.2.1"
+    "@hyperwatch/hyperwatch": "3.8.1",
+    "apollo-boost": "0.4.9",
+    "bluebird": "3.7.2",
+    "cached-request": "3.0.0",
+    "debug": "4.3.1",
+    "dotenv": "10.0.0",
+    "express": "4.17.1",
+    "express-basic-auth": "1.2.0",
+    "express-winston": "4.0.5",
+    "express-ws": "4.0.0",
+    "graphql": "15.3.0",
+    "graphql-tag": "2.11.0",
+    "image-size": "0.8.3",
+    "image-to-ascii": "3.0.13",
+    "lodash": "4.17.21",
+    "lru-cache": "6.0.0",
+    "mime-types": "2.1.27",
+    "node-fetch": "2.6.1",
+    "p-limit": "3.0.2",
+    "redis": "3.0.2",
+    "request": "2.88.2",
+    "sharp": "0.25.4",
+    "winston": "3.3.3"
   },
   "scripts": {
     "start": "NODE_ENV=production node dist/server",
@@ -47,29 +55,34 @@
     "prettier": "prettier \"src/**/*.js\" \"test/**/*.js\"",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --list-different",
-    "deploy:production": "./scripts/pre-deploy.sh production && git push production master",
-    "deploy:staging": "./scripts/pre-deploy.sh staging && git push staging master"
+    "deploy:production": "./scripts/pre-deploy.sh production && git push production main",
+    "deploy:staging": "./scripts/pre-deploy.sh staging && git push -f staging main",
+    "graphql:update": "npm-run-all graphql:updateV1 graphql:updateV2",
+    "graphql:updateV1": "npx get-graphql-schema http://localhost:3060/graphql > src/graphql/schema.graphql && prettier src/graphql/schema.graphql --write",
+    "graphql:updateV2": "npx get-graphql-schema http://localhost:3060/graphql/v2 > src/graphql/schemaV2.graphql && prettier src/graphql/schemaV2.graphql --write"
   },
   "devDependencies": {
-    "@babel/cli": "^7.6.4",
-    "@babel/core": "^7.6.4",
-    "@babel/node": "^7.6.3",
-    "@babel/preset-env": "^7.6.3",
-    "babel-eslint": "10.0.3",
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.14.3",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.14.2",
+    "babel-eslint": "10.1.0",
     "babel-plugin-lodash": "3.3.4",
-    "commitizen": "^4.0.3",
-    "cz-conventional-changelog": "^3.0.2",
-    "eslint": "^6.6.0",
-    "eslint-config-opencollective": "^2.0.0",
-    "eslint-plugin-babel": "^5.3.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-react": "^7.16.0",
-    "husky": "^3.0.9",
-    "jest": "24.9.0",
-    "lint-staged": "^9.4.2",
-    "nodemon": "^1.19.4",
-    "prettier": "1.18.2"
+    "commitizen": "^4.2.4",
+    "cz-conventional-changelog": "^3.2.0",
+    "eslint": "^7.9.0",
+    "eslint-config-opencollective": "^2.2.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-graphql": "^4.0.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-react": "^7.20.6",
+    "husky": "^4.3.0",
+    "jest": "26.4.2",
+    "lint-staged": "^10.2.11",
+    "nodemon": "^2.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "2.0.5"
   },
   "config": {
     "commitizen": {
@@ -88,8 +101,7 @@
   },
   "lint-staged": {
     "*.js": [
-      "prettier --write",
-      "git add"
+      "prettier --write"
     ]
   }
 }
